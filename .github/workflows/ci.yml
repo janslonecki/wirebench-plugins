@@ -13,10 +13,11 @@ jobs:
         with:
           path: wirebench-plugins
 
-      # The SDK lives in the app repo and is not published to PyPI yet, so CI
-      # installs it by path. When `pip install wirebench` is real this becomes
-      # one line and this checkout goes away — until then, a CI that pretended
-      # otherwise would be testing against whatever PyPI happens to hold.
+      # The SDK lives in the app repo and is not on PyPI — the `wirebench`
+      # published there is an unrelated project, so it needs a name of its
+      # own first. CI installs it by path; when it is published this becomes
+      # one line and this checkout goes away. Until then, a CI that pretended
+      # otherwise would be testing against somebody else's package.
       - uses: actions/checkout@v4
         with:
           repository: janslonecki/wirebench
