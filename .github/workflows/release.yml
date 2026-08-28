@@ -1,0 +1,79 @@
+name: Release
+
+# A tag `v<date>` cuts a release: every plugin packed by `tools/release.mjs`
+# — one packer, so the bytes and the hashes are the same whoever cut it —
+# and uploaded beside `releases.json`, the file a wirebench build pins its
+# first-party plugins against. The release notes name each plugin's version
+# and content hash, because the hash is what a wirebench build has to carry.
+#
+# Nothing binary is ever attached: a `.wbplugin` is text. The programs these
+# plugins declare stay on their authors' release pages, pinned by checksum
+# inside the manifests (wirebench docs/interop-legal.md §The plugin umbrella).
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: wirebench-plugins
+
+      # The SDK lives in the app repo (not on PyPI — that name is somebody
+      # else's), so it is installed by path.
+      - uses: actions/checkout@v4
+        with:
+          repository: janslonecki/wirebench
+          path: wirebench
+          token: ${{ secrets.WIREBENCH_READ_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the SDK
+        run: pip install -e ./wirebench/python
+
+      - name: Every plugin declares this repository's licence
+        working-directory: wirebench-plugins
+        run: node tools/check-licences.mjs
+
+      # First-party: these plugins carry the reserved keys that name code
+      # paths inside wirebench, which the SDK refuses for anyone else's.
+      - name: Validate every plugin as first party
+        working-directory: wirebench-plugins
+        run: |
+          set -euo pipefail
+          for dir in plugins/*/; do
+            [ -f "$dir/wirebench-plugin.json" ] || continue
+            wirebench-plugin validate --first-party "$dir"
+          done
+
+      - name: Pack, and write releases.json
+        working-directory: wirebench-plugins
+        run: node tools/release.mjs
+
+      - name: Publish
+        working-directory: wirebench-plugins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          notes=$(node -e '
+            const r = require("./dist/releases.json");
+            for (const p of r.plugins) console.log(`- **${p.id}** ${p.version} — sha256 \`${p.sha256}\` · content \`${p.contentHash}\``);
+          ')
+          gh release create "$GITHUB_REF_NAME" dist/*.wbplugin dist/releases.json \
+            --title "$GITHUB_REF_NAME" \
+            --notes "Packed by tools/release.mjs. A wirebench build pins a plugin by its content hash; the sha256 is the file's.
+
+$notes"

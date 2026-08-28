@@ -1,0 +1,98 @@
+{
+  "manifest": 1,
+  "id": "wirebench.arduino-cli",
+  "name": "arduino-cli",
+  "version": "1.0.0",
+  "author": "wirebench",
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "supersedes": "arduino-cli",
+  "summary": {
+    "en": "Compiles sketches and C for the MCU workbench. Its AVR core brings avr-gcc, so one download covers both.",
+    "es": "Compila sketches y C para el banco de MCU. Su núcleo AVR incluye avr-gcc, así que una descarga cubre ambos."
+  },
+  "tools": [
+    {
+      "id": "arduino-cli",
+      "binary": "arduino-cli",
+      "envVar": "WIREBENCH_ARDUINO_CLI",
+      "probe": {
+        "argv": ["version"],
+        "match": "^arduino-cli[^\\n]*?Version:\\s*(\\S+)"
+      },
+      "launch": { "kind": "exe" },
+      "pin": "1.5.1",
+      "installed": "arduino-cli",
+      "download": {
+        "darwin-arm64": [
+          {
+            "label": "arduino-cli 1.5.1",
+            "name": "arduino-cli_1.5.1_macOS_ARM64.tar.gz",
+            "url": "https://github.com/arduino/arduino-cli/releases/download/v1.5.1/arduino-cli_1.5.1_macOS_ARM64.tar.gz",
+            "sha256": "cb952e8c1621c95ef5f1d17831c945e3d0ec5973f89c557a7ec8feb9c4f7d4c9",
+            "bytes": 17000000,
+            "kind": "archive"
+          }
+        ],
+        "darwin-x64": [
+          {
+            "label": "arduino-cli 1.5.1",
+            "name": "arduino-cli_1.5.1_macOS_64bit.tar.gz",
+            "url": "https://github.com/arduino/arduino-cli/releases/download/v1.5.1/arduino-cli_1.5.1_macOS_64bit.tar.gz",
+            "sha256": "c982e940027996bea9901050e95fae99c59c1dcfee54beedecaf28141e7bf2e7",
+            "bytes": 19000000,
+            "kind": "archive"
+          }
+        ],
+        "linux-x64": [
+          {
+            "label": "arduino-cli 1.5.1",
+            "name": "arduino-cli_1.5.1_Linux_64bit.tar.gz",
+            "url": "https://github.com/arduino/arduino-cli/releases/download/v1.5.1/arduino-cli_1.5.1_Linux_64bit.tar.gz",
+            "sha256": "28a8e119c498a25607821c36cb2dc49e8463941b261a0d99091baa7bc692dd2b",
+            "bytes": 17000000,
+            "kind": "archive"
+          }
+        ],
+        "linux-arm64": [
+          {
+            "label": "arduino-cli 1.5.1",
+            "name": "arduino-cli_1.5.1_Linux_ARM64.tar.gz",
+            "url": "https://github.com/arduino/arduino-cli/releases/download/v1.5.1/arduino-cli_1.5.1_Linux_ARM64.tar.gz",
+            "sha256": "1e69e077479f300614d4551334e0a33f08ee40b04315d83b8e7e0e94f0d0ee62",
+            "bytes": 16000000,
+            "kind": "archive"
+          }
+        ],
+        "win32-x64": [
+          {
+            "label": "arduino-cli 1.5.1",
+            "name": "arduino-cli_1.5.1_Windows_64bit.zip",
+            "url": "https://github.com/arduino/arduino-cli/releases/download/v1.5.1/arduino-cli_1.5.1_Windows_64bit.zip",
+            "sha256": "fabe42e0eb04d00e776a66178299ff95a46c623dbc260f997e58fd514853dd40",
+            "bytes": 18000000,
+            "kind": "archive"
+          }
+        ]
+      },
+      "licence": "GPL-3.0",
+      "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "homepage": "https://arduino.github.io/arduino-cli/",
+      "source": ["https://github.com/arduino/arduino-cli"],
+      "post": "arduinoCore",
+      "configFile": "arduino-cli",
+      "pref": "arduinoCliPath"
+    }
+  ],
+  "provides": [
+    {
+      "slot": "mcu-compiler/1",
+      "tool": "arduino-cli",
+      "langs": ["ino"],
+      "argv": ["compile", "--fqbn", "arduino:avr:uno", "--output-dir", "{out.dir}", "{in.source.dir}"],
+      "timeout": { "default": 120, "unit": "s" },
+      "success": "exit0"
+    }
+  ]
+}

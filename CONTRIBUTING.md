@@ -39,7 +39,10 @@ maintenance rather than a pull request.
 
 - `wirebench-plugin validate plugins/<name>` passes.
 - The manifest declares `"licence": "GPL-3.0-or-later"` and a **namespaced**
-  id. Bare ids belong to the plugins that ship inside the app.
+  id. Bare ids belong to the plugins that ship inside the app, and the
+  `wirebench.*` namespace to the plugins wirebench itself publishes — a
+  contributed plugin is `you.thing`, and carries none of the reserved keys
+  (`supersedes`, `pref`, `post`, …) that only a wirebench-pinned copy may.
 - Every Python file carries the licence header, including the §7 paragraph.
   A file that travels on its own has to say what it is.
 - A `README.md` saying what it is for, in the voice of somebody deciding

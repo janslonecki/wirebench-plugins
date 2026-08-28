@@ -54,9 +54,15 @@ jobs:
             found=$((found + 1))
             name=$(basename "$dir")
             echo "── $name"
-            wirebench-plugin validate "$dir"
-            wirebench-plugin pack "$dir" -o "dist/$name.wbplugin"
+            # First-party: these plugins may carry the reserved keys that
+            # name code paths inside wirebench, which the SDK refuses for
+            # anyone else's. Everything else is checked as for a stranger.
+            wirebench-plugin validate --first-party "$dir"
+            wirebench-plugin pack --first-party "$dir" -o "dist/$name.wbplugin"
           done
+          # The release packer agrees with itself: the same tree, the same
+          # bytes, the same hashes a wirebench build would pin.
+          node tools/release.mjs
           # A run that packed nothing is not a passing run.
           if [ "$found" -eq 0 ]; then
             echo "no plugins found — refusing the silent green" >&2
