@@ -19,7 +19,7 @@ jobs:
       # otherwise would be testing against whatever PyPI happens to hold.
       - uses: actions/checkout@v4
         with:
-          repository: wirebench/wirebench
+          repository: janslonecki/wirebench
           path: wirebench
           # A public runner cannot clone a private repo without one.
           token: ${{ secrets.WIREBENCH_REPO_TOKEN }}

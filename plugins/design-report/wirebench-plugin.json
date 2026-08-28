@@ -10,7 +10,7 @@
   "licence": "GPL-3.0-or-later",
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "author": "wirebench",
-  "homepage": "https://github.com/wirebench/wirebench-plugins",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
   "requires": { "wb": 2 },
   "scopes": [],
   "actions": [
