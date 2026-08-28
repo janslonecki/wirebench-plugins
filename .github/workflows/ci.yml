@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: wirebench-plugins
+
+      # The SDK lives in the app repo and is not published to PyPI yet, so CI
+      # installs it by path. When `pip install wirebench` is real this becomes
+      # one line and this checkout goes away — until then, a CI that pretended
+      # otherwise would be testing against whatever PyPI happens to hold.
+      - uses: actions/checkout@v4
+        with:
+          repository: wirebench/wirebench
+          path: wirebench
+          # A public runner cannot clone a private repo without one.
+          token: ${{ secrets.WIREBENCH_REPO_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Zero dependencies by design, so this is a copy rather than a build.
+      - name: Install the SDK
+        run: pip install -e ./wirebench/python
+
+      - name: Every plugin declares this repository's licence
+        working-directory: wirebench-plugins
+        run: node tools/check-licences.mjs
+
+      # `validate` and `pack` both exit non-zero with a readable problem list,
+      # so they are the check — there is nothing to assert around them.
+      - name: Validate and pack every plugin
+        working-directory: wirebench-plugins
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          found=0
+          for dir in plugins/*/; do
+            [ -f "$dir/wirebench-plugin.json" ] || continue
+            found=$((found + 1))
+            name=$(basename "$dir")
+            echo "── $name"
+            wirebench-plugin validate "$dir"
+            wirebench-plugin pack "$dir" -o "dist/$name.wbplugin"
+          done
+          # A run that packed nothing is not a passing run.
+          if [ "$found" -eq 0 ]; then
+            echo "no plugins found — refusing the silent green" >&2
+            exit 1
+          fi
+          echo "packed $found plugin(s)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: wirebench-plugins/dist/*.wbplugin
+          if-no-files-found: error

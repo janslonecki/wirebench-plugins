@@ -1,0 +1,11 @@
+# Packed plugins. Built from plugins/ by `wirebench-plugin pack`, so they are
+# output, not source — and a .wbplugin committed beside its folder would be a
+# second copy to keep in step with the first.
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+.DS_Store

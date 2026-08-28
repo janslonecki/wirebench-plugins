@@ -1,0 +1,47 @@
+{
+  "manifest": 1,
+  "id": "wirebench.design-report",
+  "name": "Design report",
+  "version": "1.0.0",
+  "summary": {
+    "en": "A Markdown summary of the project: pages, parts, nets and rule-check findings.",
+    "es": "Un resumen del proyecto en Markdown: páginas, componentes, redes y hallazgos de la comprobación de reglas."
+  },
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "author": "wirebench",
+  "homepage": "https://github.com/wirebench/wirebench-plugins",
+  "requires": { "wb": 2 },
+  "scopes": [],
+  "actions": [
+    {
+      "id": "report",
+      "title": {
+        "en": "Write a design report",
+        "es": "Escribir un informe de diseño"
+      },
+      "where": ["palette", "menu"],
+      "run": { "script": "main.py", "entry": "report", "sink": "download" }
+    }
+  ],
+  "settings": [
+    {
+      "key": "list-parts",
+      "type": "bool",
+      "default": false,
+      "title": {
+        "en": "List every part individually",
+        "es": "Enumerar cada componente por separado"
+      }
+    },
+    {
+      "key": "include-bom",
+      "type": "bool",
+      "default": false,
+      "title": {
+        "en": "Append the bill of materials",
+        "es": "Añadir la lista de materiales"
+      }
+    }
+  ]
+}
