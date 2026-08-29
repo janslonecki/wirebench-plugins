@@ -91,29 +91,20 @@ jobs:
         working-directory: wirebench-plugins
         env:
           GH_TOKEN: ${{ github.token }}
-        # The notes body is assembled in full by node and passed as a FILE.
-        # It used to be spliced into a `--notes "…"` argument carrying a blank
-        # line and then a line at column 0 — which ENDS a YAML block scalar,
-        # so this workflow did not parse and every run from 2026-08-28 failed
-        # before a single job started, with no release ever published and
-        # nothing in the log to say why. Keep every line of this block
-        # indented past `run:`.
+        # Two lessons are baked into these four lines, both learned by this
+        # step failing silently:
+        #
+        #   * The notes are built by a SCRIPT IN THE REPOSITORY, not by an
+        #     inline `node -e '…'`. Shell single quotes end at the first
+        #     apostrophe, so prose ("the file's") tore the script in half and
+        #     the rest was run as shell commands.
+        #   * They are passed as a FILE. A `--notes "…"` argument spanning a
+        #     blank line and continuing at column 0 ENDS the YAML block scalar,
+        #     which is why every run from 2026-08-28 failed before a single job
+        #     started. Keep every line of this block indented past `run:`.
         run: |
           set -uo pipefail
-          node -e '
-            const r = require("./releases.json");
-            const rows = r.plugins.map(
-              (p) => `- **${p.id}** ${p.version} — sha256 \`${p.sha256}\` · content \`${p.contentHash}\``,
-            );
-            console.log(
-              [
-                "Packed by tools/release.mjs. A wirebench build pins a plugin by its content hash; the sha256 is the file's.",
-                "`releases.json` is signed by the maintainer's release key — a wirebench build verifies it before treating any entry as first-party, and Preferences ▸ Plugins lists what it names.",
-                "",
-                ...rows,
-              ].join("\n"),
-            );
-          ' > "$RUNNER_TEMP/notes.md"
+          node tools/release-notes.mjs > "$RUNNER_TEMP/notes.md"
           ls -1 dist/*.wbplugin
           # gh's reason for refusing goes into an ERROR ANNOTATION, not just
           # into the log: a log needs a token to read, an annotation does not,
