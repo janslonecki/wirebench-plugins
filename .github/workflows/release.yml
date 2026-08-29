@@ -99,7 +99,7 @@ jobs:
         # nothing in the log to say why. Keep every line of this block
         # indented past `run:`.
         run: |
-          set -euo pipefail
+          set -uo pipefail
           node -e '
             const r = require("./releases.json");
             const rows = r.plugins.map(
@@ -114,6 +114,15 @@ jobs:
               ].join("\n"),
             );
           ' > "$RUNNER_TEMP/notes.md"
-          gh release create "$GITHUB_REF_NAME" dist/*.wbplugin releases.json releases.json.sig \
-            --title "$GITHUB_REF_NAME" \
-            --notes-file "$RUNNER_TEMP/notes.md"
+          ls -1 dist/*.wbplugin
+          # gh's reason for refusing goes into an ERROR ANNOTATION, not just
+          # into the log: a log needs a token to read, an annotation does not,
+          # and the last time this failed the run said only "exit code 1".
+          if ! out=$(gh release create "$GITHUB_REF_NAME" dist/*.wbplugin releases.json releases.json.sig \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file "$RUNNER_TEMP/notes.md" 2>&1); then
+            echo "$out"
+            echo "::error title=gh release create failed::${out//$'\n'/ § }"
+            exit 1
+          fi
+          echo "$out"
