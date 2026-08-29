@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Pack every plugin for a release and write `dist/releases.json` — the file
- * a wirebench build pins its first-party plugins against.
+ * Pack every plugin for a release, write `releases.json`, and sign it — the
+ * file a wirebench build pins its first-party plugins against, and now also
+ * the file a wirebench build will *update itself from*.
  *
  * Two hashes per plugin, and they answer different questions:
  *
@@ -14,8 +15,25 @@
  *                 first-party: wirebench compares it with the hash its
  *                 catalog pins, and only a match keeps the reserved keys
  *                 (`supersedes`, `post`, `pref`, …) that name code paths in
- *                 the app. Mirrored in wirebench `electron/plugins.cjs`
+ *                 the app. Mirrored in wirebench `electron/toolManifests.cjs`
  *                 `contentHash`.
+ *
+ * ...and one signature over the index as a whole.
+ *
+ * **Why the index is signed.** A wirebench build carries pointers compiled
+ * into it, which cannot be forged. `releases.json` is a SECOND source of
+ * pointers, fetched at runtime and cached in the user's profile — where a
+ * plugin running on the desktop CPython sidecar could write it. Without a
+ * signature, such a plugin could name its own content hash and promote itself
+ * to first-party, reserved keys and all. The signature is what lets the app
+ * believe a file it did not ship.
+ *
+ * **The key never comes here.** `keygen` writes the private half outside every
+ * repository (`~/.config/wirebench/release.key`, mode 0600) and prints the
+ * public half, which is committed — here as `release-key.pub`, and in the app
+ * as `electron/releaseKey.cjs`. CI only ever runs `--check`, which *verifies*.
+ * A compromise of this repository or of its Actions must not be able to
+ * publish something wirebench will install by itself.
  *
  * Packing is done here, in Node, rather than through the SDK's `pack`, so
  * the bytes a release carries come from one packer whatever machine cut the
@@ -23,20 +41,32 @@
  * base64}}`); the app's readers do not care about whitespace. No timestamp
  * goes into anything, so the same tree packs to the same bytes.
  *
- *   node tools/release.mjs            # writes dist/*.wbplugin + dist/releases.json
- *   node tools/release.mjs --check    # exit 1 if dist/releases.json is out of date
+ *   node tools/release.mjs             # writes dist/*.wbplugin + releases.json
+ *   node tools/release.mjs sign        # signs releases.json → releases.json.sig
+ *   node tools/release.mjs keygen      # once, ever: makes the maintainer's key
+ *   node tools/release.mjs --check     # exit 1 if stale, unsigned or mis-signed
  */
-import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { createHash, generateKeyPairSync, sign as edSign, verify as edVerify, createPrivateKey, createPublicKey } from "node:crypto";
+import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
+import { homedir } from "node:os";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PLUGINS = join(ROOT, "plugins");
 const DIST = join(ROOT, "dist");
+/** Tracked, beside the plugins it describes: the app fetches it from the
+ *  release, and CI has to be able to verify the committed copy. */
+const INDEX = join(ROOT, "releases.json");
+const SIG = `${INDEX}.sig`;
+const PUBKEY = join(ROOT, "release-key.pub");
 const MANIFEST = "wirebench-plugin.json";
 const MAX_FILES = 200;
 const MAX_BYTES = 10 * 1024 * 1024;
+
+/** Outside every repository, on purpose. */
+const KEY_DIR = join(process.env.XDG_CONFIG_HOME || join(homedir(), ".config"), "wirebench");
+const KEY_FILE = join(KEY_DIR, "release.key");
 
 const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 
@@ -94,6 +124,11 @@ export function build() {
       version: manifest.version,
       licence: manifest.licence,
       supersedes: manifest.supersedes,
+      // Which wirebench this copy is for. The app refuses to stage — or to
+      // treat as first-party — an entry it does not satisfy, so a plugin that
+      // starts needing a newer app simply stops being offered to older ones
+      // instead of breaking on them.
+      requires: manifest.requires,
       file,
       bytes: Buffer.byteLength(text),
       sha256: sha256(Buffer.from(text, "utf8")),
@@ -106,27 +141,95 @@ export function build() {
   return { plugins, releases };
 }
 
+/** The index as bytes — what is written, and what is signed. One function, so
+ *  the signature can never be over a differently-formatted copy. */
+export function indexBytes(releases) {
+  return JSON.stringify(releases, null, 2) + "\n";
+}
+
+function keygen(force) {
+  if (existsSync(KEY_FILE) && !force) {
+    console.error(`refusing to overwrite ${KEY_FILE} — pass --force if you really mean to replace the release key`);
+    process.exit(1);
+  }
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  mkdirSync(KEY_DIR, { recursive: true, mode: 0o700 });
+  writeFileSync(KEY_FILE, privateKey.export({ type: "pkcs8", format: "pem" }), { mode: 0o600 });
+  chmodSync(KEY_FILE, 0o600);
+  const pub = publicKey.export({ type: "spki", format: "pem" });
+  writeFileSync(PUBKEY, pub);
+  console.log(`private key: ${KEY_FILE}  (mode 0600, outside every repository — back it up somewhere safe)`);
+  console.log(`public key:  ${PUBKEY}  (committed)\n`);
+  console.log(pub);
+  console.log("Paste the public key into wirebench's electron/releaseKey.cjs as PUBLIC_KEY_PEM.");
+}
+
+function signIndex(keyPath) {
+  const { releases } = build();
+  const bytes = Buffer.from(indexBytes(releases), "utf8");
+  const pem = readFileSync(keyPath, "utf8");
+  const sig = edSign(null, bytes, createPrivateKey(pem)).toString("base64");
+  writeFileSync(INDEX, bytes);
+  writeFileSync(SIG, sig + "\n");
+  console.log(`signed ${relative(ROOT, INDEX)} → ${relative(ROOT, SIG)}`);
+}
+
+/** Is the committed index current, present and correctly signed? */
+export function checkIndex() {
+  const { releases } = build();
+  const want = indexBytes(releases);
+  let have = "";
+  try {
+    have = readFileSync(INDEX, "utf8");
+  } catch {
+    return "releases.json is missing — run: node tools/release.mjs";
+  }
+  if (have !== want) return "releases.json is out of date — run: node tools/release.mjs";
+  let sig;
+  try {
+    sig = readFileSync(SIG, "utf8").trim();
+  } catch {
+    return "releases.json.sig is missing — run: node tools/release.mjs sign --key <path>";
+  }
+  let pub;
+  try {
+    pub = readFileSync(PUBKEY, "utf8");
+  } catch {
+    return "release-key.pub is missing — run: node tools/release.mjs keygen";
+  }
+  const ok = edVerify(null, Buffer.from(have, "utf8"), createPublicKey(pub), Buffer.from(sig, "base64"));
+  return ok ? null : "releases.json.sig does not verify — re-sign after editing any plugin";
+}
+
 const here = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
 if (here) {
-  const { plugins, releases } = build();
-  const json = JSON.stringify(releases, null, 2) + "\n";
-  if (process.argv.includes("--check")) {
-    let have = "";
-    try {
-      have = readFileSync(join(DIST, "releases.json"), "utf8");
-    } catch {
-      /* absent counts as out of date */
-    }
-    if (have !== json) {
-      console.error("dist/releases.json is out of date — run: node tools/release.mjs");
+  const argv = process.argv.slice(2);
+  const verb = argv.find((a) => !a.startsWith("--"));
+
+  if (verb === "keygen") {
+    keygen(argv.includes("--force"));
+  } else if (verb === "sign") {
+    const at = argv.indexOf("--key");
+    const keyPath = at >= 0 ? argv[at + 1] : process.env.WIREBENCH_RELEASE_KEY || KEY_FILE;
+    if (!existsSync(keyPath)) {
+      console.error(`no release key at ${keyPath} — run: node tools/release.mjs keygen`);
       process.exit(1);
     }
-    console.log("dist/releases.json is current");
+    signIndex(keyPath);
+  } else if (argv.includes("--check")) {
+    const why = checkIndex();
+    if (why) {
+      console.error(why);
+      process.exit(1);
+    }
+    console.log("releases.json is current and correctly signed");
   } else {
+    const { plugins, releases } = build();
     mkdirSync(DIST, { recursive: true });
     for (const p of plugins) writeFileSync(join(DIST, p.file), p.text);
-    writeFileSync(join(DIST, "releases.json"), json);
+    writeFileSync(INDEX, indexBytes(releases));
     for (const p of releases.plugins) console.log(`${p.file}  sha256 ${p.sha256.slice(0, 12)}…  content ${p.contentHash.slice(0, 12)}…`);
-    console.log(`wrote ${plugins.length} plugin(s) + releases.json to dist/`);
+    console.log(`wrote ${plugins.length} plugin(s) to dist/ and releases.json`);
+    console.log("now sign it:  node tools/release.mjs sign");
   }
 }

@@ -70,6 +70,14 @@ jobs:
           fi
           echo "packed $found plugin(s)"
 
+      # The committed index has to match the tree AND carry a good signature.
+      # CI only verifies — the signing key is the maintainer's and is in no
+      # secret here, because a compromise of this repository must not be able
+      # to publish something wirebench installs by itself.
+      - name: releases.json is current and correctly signed
+        working-directory: wirebench-plugins
+        run: node tools/release.mjs --check
+
       - uses: actions/upload-artifact@v4
         with:
           name: plugins

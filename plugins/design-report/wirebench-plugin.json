@@ -2,7 +2,7 @@
   "manifest": 1,
   "id": "wirebench.design-report",
   "name": "Design report",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "summary": {
     "en": "A Markdown summary of the project: pages, parts, nets and rule-check findings.",
     "es": "Un resumen del proyecto en Markdown: páginas, componentes, redes y hallazgos de la comprobación de reglas."
@@ -11,7 +11,7 @@
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "author": "wirebench",
   "homepage": "https://github.com/janslonecki/wirebench-plugins",
-  "requires": { "wb": 2 },
+  "requires": {"wb": 2, "wirebench": ">=0.1"},
   "scopes": [],
   "actions": [
     {

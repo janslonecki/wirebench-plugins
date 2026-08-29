@@ -35,8 +35,11 @@ plugins/<name>/
   main.py                  the code, carrying the licence notice (script plugins)
   README.md                what it is for
 tools/check-licences.mjs   every plugin declares the repo's licence
-tools/release.mjs          packs every plugin and writes releases.json
-dist/                      packed .wbplugin files + releases.json (gitignored)
+tools/release.mjs          packs every plugin, writes releases.json, signs it
+releases.json              the index a wirebench build updates from (tracked)
+releases.json.sig          its Ed25519 signature (tracked)
+release-key.pub            the public half of the maintainer's release key
+dist/                      packed .wbplugin files (gitignored — output)
 ```
 
 Plugin ids here are **namespaced** (`wirebench.design-report`). Bare ids are
@@ -89,16 +92,44 @@ this repository may use them.
 
 ## Releasing
 
+Once, ever — the maintainer's release key:
+
 ```console
-$ node tools/release.mjs        # dist/*.wbplugin + dist/releases.json
-$ git tag v2026.08.28 && git push origin v2026.08.28
+$ node tools/release.mjs keygen
+private key: ~/.config/wirebench/release.key   (0600, outside every repository)
+public key:  release-key.pub                   (committed)
 ```
 
-The tag runs `.github/workflows/release.yml`, which packs with the same
-tool and attaches every `.wbplugin` and `releases.json` to a GitHub release.
-The content hashes in `releases.json` are what a wirebench build copies into
-its catalog's `release` pointers — `plugin-catalog.test.ts` over there
-recomputes them from this checkout and fails when they drift.
+Back that private key up somewhere safe and paste the public half into
+wirebench's `electron/releaseKey.cjs`. It never enters this repository and
+never enters CI — CI only *verifies*, so a compromise of these Actions cannot
+publish something a wirebench build will install by itself.
+
+Then, per release:
+
+```console
+$ node tools/release.mjs        # dist/*.wbplugin + releases.json
+$ node tools/release.mjs sign   # releases.json.sig
+$ git add releases.json releases.json.sig && git commit -m "Release ..."
+$ git tag v2026.08.29 && git push origin v2026.08.29
+```
+
+The tag runs `.github/workflows/release.yml`, which packs with the same tool,
+runs `--check` (refusing a stale index, a missing signature, or one that does
+not verify), and attaches every `.wbplugin` plus `releases.json` and its
+signature to a GitHub release.
+
+`releases.json` does two jobs. Its content hashes are what a wirebench build
+copies into its catalog's `release` pointers — `plugin-catalog.test.ts` over
+there recomputes them from this checkout and fails when they drift. And the
+*signed* copy is what an installed wirebench reads at launch to find out that
+a newer version of one of these plugins exists: the signature is what lets it
+believe a file it did not ship, which matters because that file lands in the
+user's profile, where a plugin could otherwise write one naming its own hash.
+
+**Bump the version when you change a plugin.** A re-cut under the same version
+is deliberately never applied as an update by the app — "the version did not
+change" is the one promise a version number makes.
 
 ## What is not here yet
 

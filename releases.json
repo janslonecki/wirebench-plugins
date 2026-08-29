@@ -1,0 +1,57 @@
+{
+  "releases": 1,
+  "plugins": [
+    {
+      "id": "wirebench.arduino-cli",
+      "version": "1.1.0",
+      "licence": "GPL-3.0-or-later",
+      "supersedes": "arduino-cli",
+      "requires": {
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.arduino-cli-1.1.0.wbplugin",
+      "bytes": 7305,
+      "sha256": "3a7ce853a3750f9203f0a1bb5a68b731a2387f666b2c4be5fc7e06a04485cf6e",
+      "contentHash": "5fffe480c0bb15287ab47140ea5a4db3542f74aacb7e4b863745b9e04035c78c"
+    },
+    {
+      "id": "wirebench.avr-gcc",
+      "version": "1.1.0",
+      "licence": "GPL-3.0-or-later",
+      "supersedes": "avr-gcc",
+      "requires": {
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.avr-gcc-1.1.0.wbplugin",
+      "bytes": 2965,
+      "sha256": "31e02c90cc778ca27660af2352f95437175d2b00327af6ce2ad9bd1f79712c1b",
+      "contentHash": "32e8a8b8fa244ea349b00f7f6e22b4be6c84f6e0b7da5a38c3a1286048fad5c3"
+    },
+    {
+      "id": "wirebench.design-report",
+      "version": "1.1.0",
+      "licence": "GPL-3.0-or-later",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.design-report-1.1.0.wbplugin",
+      "bytes": 13338,
+      "sha256": "d6c3f866ad047847311122c5ddc2d83946af3169a8359418ca3faca8290c6da2",
+      "contentHash": "14d53a7ecd4af53d382fbd25b7c6e1e9903c5808ee7e655ac3beb2044c0c6404"
+    },
+    {
+      "id": "wirebench.freerouting",
+      "version": "1.1.0",
+      "licence": "GPL-3.0-or-later",
+      "supersedes": "freerouting",
+      "requires": {
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.freerouting-1.1.0.wbplugin",
+      "bytes": 12277,
+      "sha256": "349d1955337be8558dd9dfc50cb3e04c5d866a757ceb68f42460eae71c61774b",
+      "contentHash": "279dc616bf76618da7fbc97beb2a87478cf1057aff75307fa306788c630f1ffe"
+    }
+  ]
+}

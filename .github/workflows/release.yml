@@ -58,9 +58,17 @@ jobs:
             wirebench-plugin validate --first-party "$dir"
           done
 
-      - name: Pack, and write releases.json
+      - name: Pack, and check the committed index
         working-directory: wirebench-plugins
-        run: node tools/release.mjs
+        # `--check` refuses a stale index, a missing signature, and one that
+        # does not verify against the committed public key. Signing itself
+        # happened on the maintainer's machine before the tag: the private key
+        # is in no secret here, so a compromised workflow cannot mint a
+        # release that wirebench would install by itself.
+        run: |
+          set -euo pipefail
+          node tools/release.mjs
+          node tools/release.mjs --check
 
       - name: Publish
         working-directory: wirebench-plugins
@@ -69,11 +77,11 @@ jobs:
         run: |
           set -euo pipefail
           notes=$(node -e '
-            const r = require("./dist/releases.json");
+            const r = require("./releases.json");
             for (const p of r.plugins) console.log(`- **${p.id}** ${p.version} — sha256 \`${p.sha256}\` · content \`${p.contentHash}\``);
           ')
-          gh release create "$GITHUB_REF_NAME" dist/*.wbplugin dist/releases.json \
+          gh release create "$GITHUB_REF_NAME" dist/*.wbplugin releases.json releases.json.sig \
             --title "$GITHUB_REF_NAME" \
-            --notes "Packed by tools/release.mjs. A wirebench build pins a plugin by its content hash; the sha256 is the file's.
+            --notes "Packed by tools/release.mjs. A wirebench build pins a plugin by its content hash; the sha256 is the file's. \`releases.json\` is signed by the maintainer's release key — a wirebench build verifies it before treating any entry as first-party.
 
 $notes"
