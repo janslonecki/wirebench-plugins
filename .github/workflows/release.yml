@@ -113,7 +113,14 @@ jobs:
           # replaces an asset of the same name rather than refusing it.
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             verb="updated"
-            cmd=(gh release edit "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md")
+            # `--draft=false` is not tidiness. DELETING A TAG TURNS ITS RELEASE
+            # INTO A DRAFT, and a draft is invisible to everyone without a
+            # token: `gh release view` still finds it, so an edit reports
+            # success, while `releases/latest/download/...` — the URL every
+            # wirebench build fetches — answers 404. That is exactly how this
+            # repository spent an afternoon with a green release and nothing
+            # published.
+            cmd=(gh release edit "$GITHUB_REF_NAME" --draft=false --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md")
           else
             verb="created"
             cmd=(gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md")
