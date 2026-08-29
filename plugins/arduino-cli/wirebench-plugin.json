@@ -2,15 +2,17 @@
   "manifest": 1,
   "id": "wirebench.arduino-cli",
   "name": "arduino-cli",
-  "version": "1.2.0",
-  "requires": {"wirebench": ">=0.1"},
+  "version": "1.3.0",
+  "requires": {
+    "wirebench": ">=0.1"
+  },
   "author": "wirebench",
   "licence": "GPL-3.0-or-later",
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "homepage": "https://github.com/janslonecki/wirebench-plugins",
   "summary": {
-    "en": "Compiles sketches and C for the MCU workbench. Its AVR core brings avr-gcc, so one download covers both.",
-    "es": "Compila sketches y C para el banco de MCU. Su núcleo AVR incluye avr-gcc, así que una descarga cubre ambos."
+    "en": "Compiles sketches and C for the MCU workbench. One download brings arduino-cli and, through its AVR core, avr-gcc.",
+    "es": "Compila sketches y C para el banco de MCU. Una sola descarga trae arduino-cli y, con su núcleo AVR, avr-gcc."
   },
   "tools": [
     {
@@ -18,10 +20,14 @@
       "binary": "arduino-cli",
       "envVar": "WIREBENCH_ARDUINO_CLI",
       "probe": {
-        "argv": ["version"],
+        "argv": [
+          "version"
+        ],
         "match": "^arduino-cli[^\\n]*?Version:\\s*(\\S+)"
       },
-      "launch": { "kind": "exe" },
+      "launch": {
+        "kind": "exe"
+      },
       "pin": "1.5.1",
       "installed": "arduino-cli",
       "download": {
@@ -79,19 +85,72 @@
       "licence": "GPL-3.0",
       "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
       "homepage": "https://arduino.github.io/arduino-cli/",
-      "source": ["https://github.com/arduino/arduino-cli"],
+      "source": [
+        "https://github.com/arduino/arduino-cli"
+      ],
       "post": "arduinoCore",
       "configFile": "arduino-cli",
       "pref": "arduinoCliPath"
+    },
+    {
+      "id": "avr-gcc",
+      "binary": "avr-gcc",
+      "envVar": "WIREBENCH_AVR_GCC",
+      "probe": {
+        "argv": [
+          "--version"
+        ],
+        "match": "^[^\\n]*?(\\d+\\.\\d+(?:\\.\\d+)*)"
+      },
+      "launch": {
+        "kind": "exe"
+      },
+      "licence": "GPL-3.0",
+      "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "homepage": "https://gcc.gnu.org/wiki/avr-gcc",
+      "candidates": "arduino-avr-core",
+      "pref": "avrGccPath"
     }
   ],
   "provides": [
     {
       "slot": "mcu-compiler/1",
       "tool": "arduino-cli",
-      "langs": ["ino"],
-      "argv": ["compile", "--fqbn", "arduino:avr:uno", "--output-dir", "{out.dir}", "{in.source.dir}"],
-      "timeout": { "default": 120, "unit": "s" },
+      "langs": [
+        "ino"
+      ],
+      "argv": [
+        "compile",
+        "--fqbn",
+        "arduino:avr:uno",
+        "--output-dir",
+        "{out.dir}",
+        "{in.source.dir}"
+      ],
+      "timeout": {
+        "default": 120,
+        "unit": "s"
+      },
+      "success": "exit0"
+    },
+    {
+      "slot": "mcu-compiler/1",
+      "tool": "avr-gcc",
+      "langs": [
+        "c"
+      ],
+      "argv": [
+        "-mmcu=atmega328p",
+        "-Os",
+        "-std=gnu11",
+        "{in.source}",
+        "-o",
+        "{out.elf}"
+      ],
+      "timeout": {
+        "default": 30,
+        "unit": "s"
+      },
       "success": "exit0"
     }
   ]
