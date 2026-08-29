@@ -5,6 +5,14 @@
       "id": "wirebench.arduino-cli",
       "version": "1.1.0",
       "licence": "GPL-3.0-or-later",
+      "name": "arduino-cli",
+      "summary": {
+        "en": "Compiles sketches and C for the MCU workbench. Its AVR core brings avr-gcc, so one download covers both.",
+        "es": "Compila sketches y C para el banco de MCU. Su núcleo AVR incluye avr-gcc, así que una descarga cubre ambos."
+      },
+      "kind": "tool",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
       "supersedes": "arduino-cli",
       "requires": {
         "wirebench": ">=0.1"
@@ -18,6 +26,14 @@
       "id": "wirebench.avr-gcc",
       "version": "1.1.0",
       "licence": "GPL-3.0-or-later",
+      "name": "avr-gcc",
+      "summary": {
+        "en": "Compiles C for the MCU workbench. Bring your own, or let the Arduino AVR core install one.",
+        "es": "Compila C para el banco de MCU. Usa el tuyo o deja que el núcleo AVR de Arduino instale uno."
+      },
+      "kind": "tool",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
       "supersedes": "avr-gcc",
       "requires": {
         "wirebench": ">=0.1"
@@ -31,6 +47,14 @@
       "id": "wirebench.design-report",
       "version": "1.1.0",
       "licence": "GPL-3.0-or-later",
+      "name": "Design report",
+      "summary": {
+        "en": "A Markdown summary of the project: pages, parts, nets and rule-check findings.",
+        "es": "Un resumen del proyecto en Markdown: páginas, componentes, redes y hallazgos de la comprobación de reglas."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
       "requires": {
         "wb": 2,
         "wirebench": ">=0.1"
@@ -44,6 +68,14 @@
       "id": "wirebench.freerouting",
       "version": "1.1.0",
       "licence": "GPL-3.0-or-later",
+      "name": "freerouting",
+      "summary": {
+        "en": "An autorouter for boards, run as its own program over the Specctra DSN/SES exchange.",
+        "es": "Un autoenrutador de placas, ejecutado como programa aparte a través del intercambio Specctra DSN/SES."
+      },
+      "kind": "tool",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
       "supersedes": "freerouting",
       "requires": {
         "wirebench": ">=0.1"

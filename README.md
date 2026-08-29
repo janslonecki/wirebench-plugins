@@ -53,9 +53,16 @@ $ pip install -e ../wirebench/python          # the SDK
 $ wirebench-plugin pack plugins/design-report -o dist/design-report.wbplugin
 ```
 
-Then in wirebench: **Preferences ▸ Plugins ▸ Install a plugin…** and pick the
-file. On the desktop, wirebench itself reads it and tells you what it is —
-name, version, licence, what it may do — before anything is written.
+Then in the wirebench desktop app: **Preferences ▸ Plugins ▸ Install a
+plugin…** and pick the file. wirebench itself reads it and tells you what it is
+— name, version, licence, what it may do — before anything is written.
+
+You rarely need the file at all: everything this repository releases is
+listed under **Available from wirebench** in that same pane, found by the
+search box at its top, and installed with one click from the signed index —
+fetched from this repository's release, checked against the index's hashes,
+and confirmed in the app's own dialog first. Plugins are a desktop feature;
+the web build has none.
 
 ## Writing one
 
@@ -119,13 +126,17 @@ runs `--check` (refusing a stale index, a missing signature, or one that does
 not verify), and attaches every `.wbplugin` plus `releases.json` and its
 signature to a GitHub release.
 
-`releases.json` does two jobs. Its content hashes are what a wirebench build
+`releases.json` does three jobs. Its content hashes are what a wirebench build
 copies into its catalog's `release` pointers — `plugin-catalog.test.ts` over
-there recomputes them from this checkout and fails when they drift. And the
+there recomputes them from this checkout and fails when they drift. The
 *signed* copy is what an installed wirebench reads at launch to find out that
 a newer version of one of these plugins exists: the signature is what lets it
 believe a file it did not ship, which matters because that file lands in the
 user's profile, where a plugin could otherwise write one naming its own hash.
+And it is the list Preferences ▸ Plugins searches: each entry carries the
+manifest's `name`, `summary`, `kind`, `author` and `homepage`, so the pane
+can say what a plugin is without downloading it — the app bounds those fields
+and `tools/release.mjs` refuses the same bounds before a release is cut.
 
 **Bump the version when you change a plugin.** A re-cut under the same version
 is deliberately never applied as an update by the app — "the version did not

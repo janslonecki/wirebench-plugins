@@ -20,6 +20,14 @@
  *
  * ...and one signature over the index as a whole.
  *
+ * **The index also carries what a person would read** (2026-08-29): each
+ * entry's `name`, `summary`, `kind`, `author` and `homepage`, copied
+ * from the manifest. Preferences ▸ Plugins lists and searches what we publish
+ * from this file alone — no bundle is downloaded to find out what it is —
+ * and because the index is signed, that text is ours. The app bounds every
+ * one of these fields (`electron/releaseKey.cjs` validateIndex); `build`
+ * refuses the same bounds here so a release never fails at the far end.
+ *
  * **Why the index is signed.** A wirebench build carries pointers compiled
  * into it, which cannot be forged. `releases.json` is a SECOND source of
  * pointers, fetched at runtime and cached in the user's profile — where a
@@ -99,6 +107,33 @@ export function contentHash(files) {
   return h.digest("hex");
 }
 
+const MAX_NAME = 80;
+const MAX_SUMMARY = 300;
+const MAX_URL = 200;
+
+/** The badge a row wears — wirebench's own rule (`pluginKind` in
+ *  src/app/plugins/manifest.ts): a tool if it declares one, a script if it
+ *  has actions, content otherwise. */
+function kindOf(manifest) {
+  if (Array.isArray(manifest.tools) && manifest.tools.length) return "tool";
+  if (Array.isArray(manifest.actions) && manifest.actions.length) return "script";
+  return "content";
+}
+
+/** What the pane shows for an entry, checked against the app's bounds. */
+function displayOf(name, manifest) {
+  const fail = (why) => new Error(`plugins/${name}: ${why}`);
+  if (typeof manifest.name !== "string" || !manifest.name.trim() || manifest.name.length > MAX_NAME) throw fail(`name must be 1–${MAX_NAME} characters`);
+  const summary = manifest.summary;
+  if (typeof summary !== "object" || summary === null || typeof summary.en !== "string" || !summary.en.trim()) throw fail("summary.en is required");
+  for (const [k, v] of Object.entries(summary)) {
+    if (typeof v !== "string" || v.length > MAX_SUMMARY) throw fail(`summary.${k} must be at most ${MAX_SUMMARY} characters`);
+  }
+  if (manifest.author !== undefined && (typeof manifest.author !== "string" || manifest.author.length > MAX_NAME)) throw fail("author is too long");
+  if (manifest.homepage !== undefined && (typeof manifest.homepage !== "string" || !/^https:\/\//.test(manifest.homepage) || manifest.homepage.length > MAX_URL)) throw fail("homepage must be an https URL");
+  return { name: manifest.name, summary, kind: kindOf(manifest), author: manifest.author, homepage: manifest.homepage };
+}
+
 function pack(files) {
   const encoded = {};
   for (const [p, text] of Object.entries(files)) encoded[p] = Buffer.from(text, "utf8").toString("base64");
@@ -123,6 +158,8 @@ export function build() {
       id: manifest.id,
       version: manifest.version,
       licence: manifest.licence,
+      // What Preferences ▸ Plugins shows and searches, from the index alone.
+      ...displayOf(name, manifest),
       supersedes: manifest.supersedes,
       // Which wirebench this copy is for. The app refuses to stage — or to
       // treat as first-party — an entry it does not satisfy, so a plugin that
