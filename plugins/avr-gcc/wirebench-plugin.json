@@ -2,13 +2,12 @@
   "manifest": 1,
   "id": "wirebench.avr-gcc",
   "name": "avr-gcc",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "requires": {"wirebench": ">=0.1"},
   "author": "wirebench",
   "licence": "GPL-3.0-or-later",
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "homepage": "https://github.com/janslonecki/wirebench-plugins",
-  "supersedes": "avr-gcc",
   "summary": {
     "en": "Compiles C for the MCU workbench. Bring your own, or let the Arduino AVR core install one.",
     "es": "Compila C para el banco de MCU. Usa el tuyo o deja que el núcleo AVR de Arduino instale uno."

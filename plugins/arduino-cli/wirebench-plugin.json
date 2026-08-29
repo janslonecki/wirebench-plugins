@@ -2,13 +2,12 @@
   "manifest": 1,
   "id": "wirebench.arduino-cli",
   "name": "arduino-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "requires": {"wirebench": ">=0.1"},
   "author": "wirebench",
   "licence": "GPL-3.0-or-later",
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "homepage": "https://github.com/janslonecki/wirebench-plugins",
-  "supersedes": "arduino-cli",
   "summary": {
     "en": "Compiles sketches and C for the MCU workbench. Its AVR core brings avr-gcc, so one download covers both.",
     "es": "Compila sketches y C para el banco de MCU. Su núcleo AVR incluye avr-gcc, así que una descarga cubre ambos."

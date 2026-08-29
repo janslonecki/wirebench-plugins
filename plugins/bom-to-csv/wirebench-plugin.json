@@ -1,0 +1,36 @@
+{
+  "manifest": 1,
+  "id": "wirebench.bom-to-csv",
+  "name": "BOM to supplier CSV",
+  "version": "1.1.0",
+  "summary": {
+    "en": "Export the bill of materials as a CSV in a distributor's column order.",
+    "es": "Exporta la lista de materiales como CSV en el orden de columnas de un distribuidor."
+  },
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "author": "wirebench",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "requires": { "wb": 2, "wirebench": ">=0.1" },
+  "scopes": [],
+  "actions": [
+    {
+      "id": "export",
+      "title": {
+        "en": "Export BOM as supplier CSV",
+        "es": "Exportar la BOM como CSV de distribuidor"
+      },
+      "where": ["palette", "menu"],
+      "run": { "script": "main.py", "entry": "export_bom", "sink": "download" }
+    }
+  ],
+  "settings": [
+    {
+      "key": "supplier",
+      "type": "enum",
+      "values": ["mouser", "digikey"],
+      "default": "mouser",
+      "title": { "en": "Supplier column order", "es": "Orden de columnas del distribuidor" }
+    }
+  ]
+}

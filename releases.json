@@ -3,7 +3,7 @@
   "plugins": [
     {
       "id": "wirebench.arduino-cli",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "licence": "GPL-3.0-or-later",
       "name": "arduino-cli",
       "summary": {
@@ -13,18 +13,17 @@
       "kind": "tool",
       "author": "wirebench",
       "homepage": "https://github.com/janslonecki/wirebench-plugins",
-      "supersedes": "arduino-cli",
       "requires": {
         "wirebench": ">=0.1"
       },
-      "file": "wirebench.arduino-cli-1.1.0.wbplugin",
-      "bytes": 7305,
-      "sha256": "3a7ce853a3750f9203f0a1bb5a68b731a2387f666b2c4be5fc7e06a04485cf6e",
-      "contentHash": "5fffe480c0bb15287ab47140ea5a4db3542f74aacb7e4b863745b9e04035c78c"
+      "file": "wirebench.arduino-cli-1.2.0.wbplugin",
+      "bytes": 7261,
+      "sha256": "6db8407f6eaf06b927119f234dd7ed9ae3edc6d403aaa2da6f9272a0c0e44c52",
+      "contentHash": "2b408c0b0d0b69072983443f62a05f64c7017fd30cc469ec3da79ed23bd918d5"
     },
     {
       "id": "wirebench.avr-gcc",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "licence": "GPL-3.0-or-later",
       "name": "avr-gcc",
       "summary": {
@@ -34,14 +33,34 @@
       "kind": "tool",
       "author": "wirebench",
       "homepage": "https://github.com/janslonecki/wirebench-plugins",
-      "supersedes": "avr-gcc",
       "requires": {
         "wirebench": ">=0.1"
       },
-      "file": "wirebench.avr-gcc-1.1.0.wbplugin",
-      "bytes": 2965,
-      "sha256": "31e02c90cc778ca27660af2352f95437175d2b00327af6ce2ad9bd1f79712c1b",
-      "contentHash": "32e8a8b8fa244ea349b00f7f6e22b4be6c84f6e0b7da5a38c3a1286048fad5c3"
+      "file": "wirebench.avr-gcc-1.2.0.wbplugin",
+      "bytes": 2929,
+      "sha256": "4f59d78cf64648d2161a3f6f9272bc6552aaa5c0bc5dd7e9c9335f38da872845",
+      "contentHash": "bc77352b8a23bdf0c9ac40bb3fba2105487af2736d397c0f88d1d62761321425"
+    },
+    {
+      "id": "wirebench.bom-to-csv",
+      "version": "1.1.0",
+      "licence": "GPL-3.0-or-later",
+      "name": "BOM to supplier CSV",
+      "summary": {
+        "en": "Export the bill of materials as a CSV in a distributor's column order.",
+        "es": "Exporta la lista de materiales como CSV en el orden de columnas de un distribuidor."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.bom-to-csv-1.1.0.wbplugin",
+      "bytes": 10722,
+      "sha256": "5cde99dbefd29f7d59997a182fab067ee3288388d3a114383cd0eb06c1003548",
+      "contentHash": "99b1f58a3d23662615d8f66cc3d6bb818f971cd0f6b71cd540a6bd9cde58ab80"
     },
     {
       "id": "wirebench.design-report",
@@ -66,7 +85,7 @@
     },
     {
       "id": "wirebench.freerouting",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "licence": "GPL-3.0-or-later",
       "name": "freerouting",
       "summary": {
@@ -76,14 +95,13 @@
       "kind": "tool",
       "author": "wirebench",
       "homepage": "https://github.com/janslonecki/wirebench-plugins",
-      "supersedes": "freerouting",
       "requires": {
         "wirebench": ">=0.1"
       },
-      "file": "wirebench.freerouting-1.1.0.wbplugin",
-      "bytes": 12277,
-      "sha256": "349d1955337be8558dd9dfc50cb3e04c5d866a757ceb68f42460eae71c61774b",
-      "contentHash": "279dc616bf76618da7fbc97beb2a87478cf1057aff75307fa306788c630f1ffe"
+      "file": "wirebench.freerouting-1.2.0.wbplugin",
+      "bytes": 12237,
+      "sha256": "4846f9bf0618425c3724ac2d3c39889f84a2bf9e04a11cc2d508f1c4dadc5d5b",
+      "contentHash": "634d0b30c51a9f722f702caed16cddfe2ec7c173011cd35e5f229e71ea4bdccf"
     }
   ]
 }

@@ -2,13 +2,12 @@
   "manifest": 1,
   "id": "wirebench.freerouting",
   "name": "freerouting",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "requires": {"wirebench": ">=0.1"},
   "author": "wirebench",
   "licence": "GPL-3.0-or-later",
   "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
   "homepage": "https://github.com/janslonecki/wirebench-plugins",
-  "supersedes": "freerouting",
   "summary": {
     "en": "An autorouter for boards, run as its own program over the Specctra DSN/SES exchange.",
     "es": "Un autoenrutador de placas, ejecutado como programa aparte a través del intercambio Specctra DSN/SES."
