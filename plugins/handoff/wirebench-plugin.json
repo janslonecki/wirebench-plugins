@@ -1,0 +1,57 @@
+{
+  "manifest": 1,
+  "id": "wirebench.handoff",
+  "name": "Handoff package",
+  "version": "1.0.0",
+  "summary": {
+    "en": "Export everything a fab, an assembler or a colleague needs, as one zip.",
+    "es": "Exporta en un solo zip todo lo que necesitan la fábrica, el ensamblador o un colega."
+  },
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "author": "wirebench",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "requires": {
+    "wb": 2,
+    "wirebench": ">=0.1"
+  },
+  "scopes": [],
+  "actions": [
+    {
+      "id": "export",
+      "title": {
+        "en": "Export handoff package…",
+        "es": "Exportar paquete de entrega…"
+      },
+      "where": [
+        "palette",
+        "menu"
+      ],
+      "run": {
+        "script": "main.py",
+        "entry": "handoff",
+        "sink": "bundle"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "formats",
+      "type": "text",
+      "default": "bom,net,kicad_sch,kicad_pcb,pdf,gerbers,drill,gbrjob,compfiles,drillmap,pos",
+      "title": {
+        "en": "Documents to include (export ids, comma-separated)",
+        "es": "Documentos a incluir (ids de exportación, separados por comas)"
+      }
+    },
+    {
+      "key": "check",
+      "type": "bool",
+      "default": true,
+      "title": {
+        "en": "Refuse to build the package when ERC or DRC reports an error",
+        "es": "No generar el paquete si ERC o DRC informan un error"
+      }
+    }
+  ]
+}
