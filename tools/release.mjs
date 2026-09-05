@@ -116,6 +116,7 @@ const MAX_URL = 200;
  *  has actions, content otherwise. */
 function kindOf(manifest) {
   if (Array.isArray(manifest.tools) && manifest.tools.length) return "tool";
+  if (manifest.llm) return "script";
   if (Array.isArray(manifest.actions) && manifest.actions.length) return "script";
   return "content";
 }

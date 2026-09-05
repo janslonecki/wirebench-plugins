@@ -94,7 +94,7 @@ for (const name of dirs) {
 
   // Every Python file the plugin ships carries the notice, because a file
   // that travels on its own has to say what it is.
-  for (const action of m.actions ?? []) {
+  for (const action of [...(m.actions ?? []), ...(m.llm ? [{run: {script: m.llm.module}}] : [])]) {
     const script = action?.run?.script;
     if (typeof script !== "string") continue;
     const scriptPath = join(PLUGINS, name, script);
