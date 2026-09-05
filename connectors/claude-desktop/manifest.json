@@ -1,0 +1,25 @@
+{
+  "manifest_version": "0.3",
+  "name": "wirebench",
+  "display_name": "WireBench engineering drafts",
+  "version": "1.0.0",
+  "description": "Build and verify isolated circuit drafts in the running WireBench desktop app. Pair in WireBench and accept finished work there.",
+  "author": { "name": "wirebench" },
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "server": {
+    "type": "node",
+    "entry_point": "server.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.mjs"],
+      "env": { "WIREBENCH_MCP_URL": "${user_config.url}", "WIREBENCH_MCP_TOKEN": "${user_config.token}" }
+    }
+  },
+  "tools_generated": true,
+  "compatibility": { "platforms": ["darwin", "win32"], "runtimes": { "node": ">=20" } },
+  "user_config": {
+    "url": { "type": "string", "title": "WireBench MCP URL", "description": "The http://127.0.0.1:PORT/mcp URL shown in WireBench Assistant → External assistants.", "required": true },
+    "token": { "type": "string", "title": "WireBench pairing token", "description": "The token shown once after Pair client. This is a local pairing token, not a model API key.", "sensitive": true, "required": true }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "manifest": 1,
+  "id": "wirebench.gemini",
+  "name": "Google Gemini",
+  "version": "1.0.0",
+  "summary": {
+    "en": "Gemini language models in the wirebench assistant. Uses your Google API key; provider usage charges apply.",
+    "es": "Modelos Gemini en el asistente de wirebench. Usa tu clave API de Google; se aplican los cargos del proveedor."
+  },
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "author": "wirebench",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "requires": {
+    "wb": 2,
+    "wirebench": ">=0.1"
+  },
+  "scopes": [],
+  "llm": {
+    "protocol": "llm/1",
+    "module": "main.mjs",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/interactions",
+    "auth": "x-goog-api-key"
+  }
+}

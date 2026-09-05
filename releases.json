@@ -105,6 +105,27 @@
       "contentHash": "634d0b30c51a9f722f702caed16cddfe2ec7c173011cd35e5f229e71ea4bdccf"
     },
     {
+      "id": "wirebench.gemini",
+      "version": "1.0.0",
+      "licence": "GPL-3.0-or-later",
+      "name": "Google Gemini",
+      "summary": {
+        "en": "Gemini language models in the wirebench assistant. Uses your Google API key; provider usage charges apply.",
+        "es": "Modelos Gemini en el asistente de wirebench. Usa tu clave API de Google; se aplican los cargos del proveedor."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.gemini-1.0.0.wbplugin",
+      "bytes": 10679,
+      "sha256": "2f3741b11a1dc84f8e366fe95d14603ea41a16033310d551b391a6054275bdee",
+      "contentHash": "db8562783a14995f3bd944698a77f558d733eb015ef241a0d203218bd4b95b20"
+    },
+    {
       "id": "wirebench.handoff",
       "version": "1.0.0",
       "licence": "GPL-3.0-or-later",

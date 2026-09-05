@@ -151,10 +151,19 @@ plugin here is source, JSON and project files, never a compiled anything.
 
 ## Assistant providers
 
-`plugins/openai` and `plugins/anthropic` implement the desktop assistant's
+`plugins/openai`, `plugins/anthropic` and `plugins/gemini` implement the desktop assistant's
 `llm/1` protocol. They run only after Generate or Resume, transform provider
 messages in isolated workers, and never receive API keys or a project handle.
 wirebench owns the authenticated HTTP request, engineering tools and draft
 review. Test the codecs with `node --test tools/test-llm.mjs`; the app repository
-contains an Electron fixture test covering both providers and real Python
+contains an Electron fixture test covering all three providers, local MCP and real Python
 execution. Provider usage charges belong to the user's own API account.
+
+
+## External clients
+
+[Client setup](connectors/README.md) covers Claude Desktop/Code, Codex and Gemini CLI.
+The separate Claude Desktop MCPB extension forwards requests to WireBench’s local
+MCP listener. Build it with `python3 tools/build-mcpb.py`; no Python is needed at
+runtime. Ship a compatible WireBench desktop build before publishing Gemini or
+the extension. They are separate downloads, never bundled into the app.

@@ -54,3 +54,46 @@ test("Anthropic truncation and transport errors never return tool calls", () => 
   d.push('{"type":"message_stop"}');
   assert.throws(() => d.finish());
 });
+
+import * as gemini from "../plugins/gemini/main.mjs";
+const geminiEvents = [
+  { event_type: "step.start", index: 0, step: { type: "thought" } },
+  { event_type: "step.delta", index: 0, delta: { type: "thought_summary", content: { type: "text", text: "plan" } } },
+  { event_type: "step.delta", index: 0, delta: { type: "thought_signature", signature: "signed-thought" } },
+  { event_type: "step.stop", index: 0 },
+  { event_type: "step.start", index: 1, step: { type: "function_call", id: "g1", name: "python", signature: "signed-call" } },
+  { event_type: "step.delta", index: 1, delta: { type: "arguments_delta", arguments: '{"code":' } },
+  { event_type: "step.delta", index: 1, delta: { type: "arguments_delta", arguments: '"assert True"}' } },
+  { event_type: "step.stop", index: 1 },
+  { event_type: "interaction.completed", interaction: { status: "requires_action", usage: { total_input_tokens: 10, total_output_tokens: 20, total_thought_tokens: 5, total_tokens: 35 } } },
+];
+test("Gemini reconstructs signed steps without terminal steps and sends matching image results", () => {
+  const d = gemini.decoder(); for (const e of geminiEvents) d.push(JSON.stringify(e));
+  const reply = d.finish();
+  assert.deepEqual(reply.calls, [{ id: "g1", name: "python", arguments: { code: "assert True" } }]);
+  assert.deepEqual(reply.usage, { input: 10, output: 25 });
+  const next = gemini.encode({ ...request, turns: [{ continuation: reply.continuation, results: [{ id: "g1", content: "ok", images: [{ name: "Main", mimeType: "image/png", data: "cG5n" }] }] }] });
+  assert.equal(next.store, false); assert.equal(next.stream, true);
+  assert.equal(next.system_instruction, "system");
+  assert.equal(next.tools[0].type, "function");
+  assert.deepEqual(next.input.slice(1, 3), reply.continuation);
+  assert.equal(next.input[1].signature, "signed-thought");
+  assert.equal(next.input[2].signature, "signed-call");
+  assert.deepEqual(next.input[3], { type: "function_result", name: "python", call_id: "g1", result: [{ type: "text", text: "ok" }, { type: "text", text: "Draft page: Main" }, { type: "image", mime_type: "image/png", data: "cG5n" }] });
+});
+test("Gemini text streaming and final snapshots preserve unknown signed metadata", () => {
+  const d = gemini.decoder();
+  d.push(JSON.stringify({ event_type: "step.start", index: 0, step: { type: "model_output" } }));
+  assert.equal(d.push(JSON.stringify({ event_type: "step.delta", index: 0, delta: { type: "text", text: "Ready" } })), "Ready");
+  d.push(JSON.stringify({ event_type: "step.stop", index: 0 }));
+  d.push(JSON.stringify({ event_type: "interaction.completed", interaction: { status: "completed" } }));
+  assert.equal(d.finish().text, "Ready");
+  const final = gemini.decoder(), steps = [{ type: "thought", signature: "opaque", extra: { version: 2 } }];
+  final.push(JSON.stringify({ event_type: "interaction.completed", interaction: { status: "completed", steps } }));
+  assert.deepEqual(final.finish().continuation, steps);
+});
+test("Gemini rejects truncated, failed, malformed and unsupported streams before executing tools", () => {
+  for (const events of [geminiEvents.slice(0, -1), geminiEvents.filter(e => e.event_type !== "step.stop"), [{ event_type: "interaction.completed", interaction: { status: "incomplete" } }], [{ event_type: "error", error: { message: "private account details" } }], [{ event_type: "step.delta", index: 0, delta: { type: "text", text: "bad" } }], [{ event_type: "interaction.completed", interaction: { status: "requires_action", steps: [{ type: "function_call", id: "x", name: "python", arguments: "bad" }] } }]]) {
+    assert.throws(() => { const d = gemini.decoder(); for (const e of events) d.push(JSON.stringify(e)); d.finish(); });
+  }
+});

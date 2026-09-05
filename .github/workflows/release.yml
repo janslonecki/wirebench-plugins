@@ -91,6 +91,10 @@ jobs:
           node tools/release.mjs
           node tools/release.mjs --check
 
+      - name: Build Claude Desktop extension
+        working-directory: wirebench-plugins
+        run: python3 tools/build-mcpb.py
+
       - name: Publish
         working-directory: wirebench-plugins
         env:
@@ -139,7 +143,7 @@ jobs:
           fi
           echo "$out"
           if ! out=$(gh release upload "$GITHUB_REF_NAME" --clobber \
-              dist/*.wbplugin releases.json releases.json.sig 2>&1); then
+              dist/*.wbplugin dist/*.mcpb releases.json releases.json.sig 2>&1); then
             echo "$out"
             echo "::error title=gh release upload failed::${out//$'\n'/ § }"
             exit 1
