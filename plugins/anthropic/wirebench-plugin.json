@@ -1,0 +1,28 @@
+{
+  "manifest": 1,
+  "id": "wirebench.anthropic",
+  "name": "Anthropic",
+  "version": "1.0.0",
+  "summary": {
+    "en": "Anthropic language models in the wirebench assistant. Uses your API key; provider usage charges apply.",
+    "es": "Modelos de Anthropic en el asistente de wirebench. Usa tu clave API; se aplican los cargos del proveedor."
+  },
+  "licence": "GPL-3.0-or-later",
+  "licenceUrl": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "author": "wirebench",
+  "homepage": "https://github.com/janslonecki/wirebench-plugins",
+  "requires": {
+    "wb": 2,
+    "wirebench": ">=0.1"
+  },
+  "scopes": [],
+  "llm": {
+    "protocol": "llm/1",
+    "module": "main.mjs",
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "auth": "x-api-key",
+    "headers": {
+      "anthropic-version": "2023-06-01"
+    }
+  }
+}

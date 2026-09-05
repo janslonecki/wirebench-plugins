@@ -148,3 +148,13 @@ change" is the one promise a version number makes.
 and decoded as text, capped at 10 MB. That is a deliberate security property —
 no archive means no absolute members, no `..`, no symlinks, no zip-slip — so a
 plugin here is source, JSON and project files, never a compiled anything.
+
+## Assistant providers
+
+`plugins/openai` and `plugins/anthropic` implement the desktop assistant's
+`llm/1` protocol. They run only after Generate or Resume, transform provider
+messages in isolated workers, and never receive API keys or a project handle.
+wirebench owns the authenticated HTTP request, engineering tools and draft
+review. Test the codecs with `node --test tools/test-llm.mjs`; the app repository
+contains an Electron fixture test covering both providers and real Python
+execution. Provider usage charges belong to the user's own API account.

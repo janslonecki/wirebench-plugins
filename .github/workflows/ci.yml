@@ -46,6 +46,10 @@ jobs:
         if: steps.sdk.outcome == 'success'
         run: pip install -e ./wirebench/python
 
+      - name: Language model protocol tests
+        working-directory: wirebench-plugins
+        run: node --test tools/test-llm.mjs
+
       - name: Every plugin declares this repository's licence
         working-directory: wirebench-plugins
         run: node tools/check-licences.mjs

@@ -2,6 +2,27 @@
   "releases": 1,
   "plugins": [
     {
+      "id": "wirebench.anthropic",
+      "version": "1.0.0",
+      "licence": "GPL-3.0-or-later",
+      "name": "Anthropic",
+      "summary": {
+        "en": "Anthropic language models in the wirebench assistant. Uses your API key; provider usage charges apply.",
+        "es": "Modelos de Anthropic en el asistente de wirebench. Usa tu clave API; se aplican los cargos del proveedor."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.anthropic-1.0.0.wbplugin",
+      "bytes": 6979,
+      "sha256": "16eeed7277a195967b995256bc915d79353ff5d4db9b8afe02147466118869cf",
+      "contentHash": "a4bee2f51a9dccbd07c19b7e00b38bb27d05c3e49fc9353f3dba9beb9e0ff7ef"
+    },
+    {
       "id": "wirebench.arduino-cli",
       "version": "1.3.0",
       "licence": "GPL-3.0-or-later",
@@ -82,6 +103,48 @@
       "bytes": 12237,
       "sha256": "4846f9bf0618425c3724ac2d3c39889f84a2bf9e04a11cc2d508f1c4dadc5d5b",
       "contentHash": "634d0b30c51a9f722f702caed16cddfe2ec7c173011cd35e5f229e71ea4bdccf"
+    },
+    {
+      "id": "wirebench.handoff",
+      "version": "1.0.0",
+      "licence": "GPL-3.0-or-later",
+      "name": "Handoff package",
+      "summary": {
+        "en": "Export everything a fab, an assembler or a colleague needs, as one zip.",
+        "es": "Exporta en un solo zip todo lo que necesitan la fábrica, el ensamblador o un colega."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.handoff-1.0.0.wbplugin",
+      "bytes": 13062,
+      "sha256": "b0efe0127875a4ccc03d0ea886247c0b53b5a0bc245aa78ef39b24dbaa684dab",
+      "contentHash": "a0cdd9fea4b3b307fe4592187e0a7c304fc06b4fad28e056e40952433689ec12"
+    },
+    {
+      "id": "wirebench.openai",
+      "version": "1.0.0",
+      "licence": "GPL-3.0-or-later",
+      "name": "OpenAI",
+      "summary": {
+        "en": "OpenAI language models in the wirebench assistant. Uses your API key; provider usage charges apply.",
+        "es": "Modelos de OpenAI en el asistente de wirebench. Usa tu clave API; se aplican los cargos del proveedor."
+      },
+      "kind": "script",
+      "author": "wirebench",
+      "homepage": "https://github.com/janslonecki/wirebench-plugins",
+      "requires": {
+        "wb": 2,
+        "wirebench": ">=0.1"
+      },
+      "file": "wirebench.openai-1.0.0.wbplugin",
+      "bytes": 5647,
+      "sha256": "c0f684b04d1a7771f028b0a9aee9ff66b0cb7f2ae71e0fe517c47622e1d5a646",
+      "contentHash": "ea239bbf23631aeda878b7cc9f6ea7332872d2fcee0241edef395cb0a26ec70c"
     }
   ]
 }
